@@ -1,5 +1,6 @@
-import NextAuth from 'next-auth';
-import Providers from 'next-auth/providers';
+import NextAuth from 'next-auth'
+import Providers from 'next-auth/providers'
+import { saveUser, getUser } from '../../../lib/data'
 
 const providers = [
   Providers.GitHub({
@@ -11,6 +12,7 @@ const providers = [
 const callbacks = {};
 
 callbacks.signIn = async function signIn(user, account, metadata) {
+  // gets the user id
   const emailRes = await fetch('https://api.github.com/user/emails', {
     headers: {
       Authorization: `token ${account.accessToken}`
@@ -19,7 +21,44 @@ callbacks.signIn = async function signIn(user, account, metadata) {
   const emails = await emailRes.json();
   const primaryEmail = emails.find((e) => e.primary).email;
 
-  user.email = primaryEmail;
+  // build user from email
+  const githubUser = {
+    id: metadata.id,
+    login: metadata.login,
+    name: metadata.name,
+    email: primaryEmail,
+    avatar: user.image
+  };
+
+  // save user to local datastore
+  user.id = await saveUser('github', githubUser);
+  return true;
+};
+
+callbacks.jwt = async function jwt(token, user) {
+  if (user) {
+    token = { id: user.id };
+  }
+
+  return token;
+};
+
+callbacks.session = async function session(session, token) {
+  const dbUser = await getUser(token.id);
+  if (!dbUser) {
+    return null;
+  }
+
+  session.user = {
+    id: dbUser.id,
+    github: {
+      avatar: dbUser.github.avatar,
+      login: dbUser.github.login,
+      name: dbUser.github.name
+    }
+  };
+
+  return session;
 };
 
 const options = {

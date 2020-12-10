@@ -1,31 +1,24 @@
-import React, { useEffect } from 'react'
-import { Avatar, Box, Flex, Heading, Slide } from '@chakra-ui/react'
+import React, { useEffect } from 'react';
+import { Avatar, Box, Flex, Heading, Slide } from '@chakra-ui/react';
 
-import { Nav } from './nav'
+import { Nav } from './nav';
 
-import { useNavDispatch } from '@/chakra/contexts/nav-context'
+import { useNavDispatch } from '@/chakra/contexts/nav-context';
 import { useSession } from 'next-auth/client';
 
-export const Header = ({
-  title,
-  Logo,
-  pages,
-  controls,
-  headerShow = false,
-  ...rest
-}) => {
-  const { updatePages, updateControls } = useNavDispatch()
+export const Header = ({ title, Logo, pages, controls, headerShow = false, ...rest }) => {
+  const { updatePages, updateControls } = useNavDispatch();
   const [session] = useSession();
 
   useEffect(() => {
-    if (!pages) return
-    updatePages(pages)
-  }, [])
+    if (!pages) return;
+    updatePages(pages);
+  }, []);
 
   useEffect(() => {
-    if (!controls) return
-    updateControls(controls)
-  }, [])
+    if (!controls) return;
+    updateControls(controls);
+  }, []);
 
   return (
     headerShow && (
@@ -49,11 +42,17 @@ export const Header = ({
             )}
             <Nav title={title} {...{ Logo }} />
             {session && (
-              <Avatar size="sm" src={session.user.image} className="user" ml={4} my="auto" />
+              <Avatar
+                size="sm"
+                src={session.user.github.avatar}
+                className="user"
+                ml={4}
+                my="auto"
+              />
             )}
           </Flex>
         </Box>
       </Slide>
     )
-  )
-}
+  );
+};
