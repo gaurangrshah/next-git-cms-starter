@@ -22,3 +22,9 @@ $ yarn dev
 - [Chakra UI](https://chakra-ui.com/)
 - [framer-motion](https://www.framer.com/api/motion/)
 - [Vercel](https://vercel.com)
+
+create a new repo (separate from this one) with a directory called data at it's root.
+
+Insert markdown files in that directory with the file names in the following format:
+
+year-month-day-<post-title>.md

@@ -6,8 +6,8 @@
 
 const BASE_URL = 'https://<site-path>.vercel.app';
 
-const title = 'Next Chakra Starter';
-const description = 'Next.js with Chakra UI Starter Template';
+const title = 'NextJS GithubCMS starter';
+const description = 'Next.js with Chakra UI Starter used to render markdown';
 
 const SEO = {
   title,
