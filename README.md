@@ -23,8 +23,10 @@ $ yarn dev
 - [framer-motion](https://www.framer.com/api/motion/)
 - [Vercel](https://vercel.com)
 
-create a new repo (separate from this one) with a directory called data at it's root.
+create a new directory in the root of this project `/data` at it's root.
 
 Insert markdown files in that directory with the file names in the following format:
 
+```markdown
 year-month-day-<post-title>.md
+```
