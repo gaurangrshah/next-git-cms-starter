@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
-import { Box, Flex, Heading, Slide } from '@chakra-ui/react'
+import { Avatar, Box, Flex, Heading, Slide } from '@chakra-ui/react'
 
 import { Nav } from './nav'
 
 import { useNavDispatch } from '@/chakra/contexts/nav-context'
+import { useSession } from 'next-auth/client';
 
 export const Header = ({
   title,
@@ -14,6 +15,7 @@ export const Header = ({
   ...rest
 }) => {
   const { updatePages, updateControls } = useNavDispatch()
+  const [session] = useSession();
 
   useEffect(() => {
     if (!pages) return
@@ -46,6 +48,9 @@ export const Header = ({
               </Heading>
             )}
             <Nav title={title} {...{ Logo }} />
+            {session && (
+              <Avatar size="sm" src={session.user.image} className="user" ml={4} my="auto" />
+            )}
           </Flex>
         </Box>
       </Slide>

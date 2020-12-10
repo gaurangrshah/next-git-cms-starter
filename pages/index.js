@@ -1,7 +1,8 @@
-import Link from 'next/link';
-import Theme from '../components/Theme';
-import ms from 'ms';
-import { getPostList } from '../lib/data';
+import Link from 'next/link'
+import Theme from '../components/Theme'
+import ms from 'ms'
+import { getPostList } from '../lib/data'
+
 
 export default function Home({ postList }) {
   return (
@@ -23,7 +24,7 @@ export default function Home({ postList }) {
 }
 
 export async function getStaticProps() {
-  const postList = await getPostList();
+  const postList = await getPostList()
 
   return {
     props: {

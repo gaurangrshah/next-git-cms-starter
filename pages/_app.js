@@ -1,5 +1,6 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import {DefaultSeo} from "next-seo"
+import { Provider} from 'next-auth/client';
 
 import theme from '@/chakra';
 import { ToastProvider } from '@/chakra/contexts/toast-context';
@@ -16,9 +17,11 @@ const App = ({ Component, pageProps }) => {
       <ChakraProvider resetCSS theme={theme}>
         <Nprogress />
         <ToastProvider>
-          <DefaultLayout config={{ headerShow: true, footerShow: true }}>
+          <Provider>
+            <DefaultLayout config={{ headerShow: true, footerShow: true }}>
               <Component {...pageProps} />
-          </DefaultLayout>
+            </DefaultLayout>
+          </Provider>
         </ToastProvider>
       </ChakraProvider>
     </>
