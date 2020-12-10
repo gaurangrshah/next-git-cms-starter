@@ -43,3 +43,22 @@ requires github personal access token to allow rest-api based acess to update re
 > Be sure to provide all "repo" permissions to the token
 
 ---
+
+---
+
+**setup next-auth**
+In order to setup next-auth using github login, we'll need to [generate a new Github ClientId && Secret](https://github.com/settings/developers)
+
+**❗️ NOTE**
+For each application we'll need a set of credentials for each environment that we want to allow login from so generally that means we'll need a set of credentials for development, staging, and production.
+
+Use the following settings when configuring the OAuth credentials:
+
+```
+homepage url: http://localhost:3000
+http://localhost:3000/api/auth
+```
+
+> we are able to simply generate a new secret for each application instead of need be, allowing us to keep the same configuration (if the callback url required is the same)
+
+---
