@@ -8,9 +8,7 @@ const [session] = useSession();
 console.log('SESSION', session);
    const handleLogin = (e) => {
     e.preventDefault();
-    console.log('signin before');
-    signIn();
-    console.log('signin after');
+    signIn('github');
    };
 
   const handleLogout = (e) => {
