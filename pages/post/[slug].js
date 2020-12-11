@@ -5,8 +5,13 @@ import Youtube from '../../components/Youtube';
 import { getPostList, getPost } from '../../lib/data';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import findImageInMarkdown from '../../lib/find-image-in-markdown';
+
 
 export default function Post({ post }) {
+
+  post.url = `${process.env.NEXT_PUBLIC_ROOT_URL}/post/${post.slug}`
+
   const router = useRouter();
   if (router.isFallback) {
     return <Theme>loading...</Theme>;
@@ -25,6 +30,17 @@ export default function Post({ post }) {
 
   return (
     <Theme>
+      <Head>
+        <title>{post.title}</title>
+        <meta name="description" content={post.summary} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="og:site_name" content="My Blog App" />
+        <meta property="og:url" content={post.url} />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content={post.summary} />
+        post.image && (<meta property="og:image" content={post.image} />
+        )}
+      </Head>
       <div className="post">
         <div className="time">Published {ms(Date.now() - post.createdAt, { long: true })} ago</div>
         <h1>{post.title}</h1>
@@ -63,6 +79,7 @@ export async function getStaticProps({ params }) {
 
   try {
     post = await getPost(params.slug);
+    post.image = findImageInMarkdown(post.content);
   } catch (err) {
     if (err.status !== 404) {
       throw err;
