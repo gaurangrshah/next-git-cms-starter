@@ -44,7 +44,7 @@ export const Header = ({ title, Logo, pages, controls, headerShow = false, ...re
             {session && (
               <Avatar
                 size="sm"
-                src={session.user.github.avatar}
+                src={session.user.profile.avatar}
                 className="user"
                 ml={4}
                 my="auto"
