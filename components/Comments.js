@@ -11,16 +11,16 @@ async function swrFetcher(path) {
 }
 
 export default function Comments({ slug }) {
-  const { data: comments, mutate } = useSWR(`/api/comments?slug=${slug}`, swrFetcher);
   const [session] = useSession();
+  const { data: comments, mutate } = useSWR(`/api/comments?slug=${slug}`, swrFetcher);
 
-  const createComment = async (comment) => {
+  const createComment = async (fakeComment) => {
     const fetchRes = await fetch(`/api/comments?slug=${slug}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ content: comment.content })
+      body: JSON.stringify({ content: fakeComment.content })
     });
 
     if (!fetchRes.ok) {
@@ -28,11 +28,11 @@ export default function Comments({ slug }) {
     }
 
     const addedComment = await fetchRes.json();
+
     mutate((currentComments) => {
       const newComments = [];
       for (const c of currentComments) {
-        // iterate over the existing comments cache
-        if (c.id === comment.id) {
+        if (c.id === fakeComment.id) {
           newComments.push(addedComment);
         } else {
           newComments.push(c);
@@ -44,25 +44,25 @@ export default function Comments({ slug }) {
   };
 
   const handleAddComment = async (content) => {
-     const mockCommentBody = {
-        id: Math.random(),
-        userId: session.user.id,
-        name: session.user.profile.name,
-        avatar: session.user.profile.avatar,
-        content,
-        createdAt: Date.now(),
-        clientOnly: true
-    }
+    const fakeComment = {
+      id: Math.random(),
+      userId: session.user.id,
+      name: session.user.profile.name,
+      avatar: session.user.profile.avatar,
+      content,
+      createdAt: Date.now(),
+      clientOnly: true
+    };
 
-    mutate([...comments, mockCommentBody], false)
+    mutate([...comments, fakeComment], false);
 
-    await createComment(mockCommentBody).catch((err) => {
+    createComment(fakeComment).catch((err) => {
       mutate((currentComments) => {
         const newComments = [];
         for (const c of currentComments) {
-          if (c.id === mockCommentBody.id) {
+          if (c.id === fakeComment.id) {
             newComments.push({
-              ...mockCommentBody,
+              ...fakeComment,
               error: err.message
             });
           } else {
@@ -74,7 +74,6 @@ export default function Comments({ slug }) {
       }, false);
     });
   };
-
   if (!comments) {
     return (
       <div className="comments">
