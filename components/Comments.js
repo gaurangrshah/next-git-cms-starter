@@ -2,6 +2,8 @@ import Markdown from 'markdown-to-jsx';
 import ms from 'ms';
 import useSWR from 'swr';
 import AddCommentBox from './AddCommentBox';
+import classNames from 'classnames';
+import { useSession } from 'next-auth/client';
 
 async function swrFetcher(path) {
   const res = await fetch(path);
@@ -10,21 +12,67 @@ async function swrFetcher(path) {
 
 export default function Comments({ slug }) {
   const { data: comments, mutate } = useSWR(`/api/comments?slug=${slug}`, swrFetcher);
+  const [session] = useSession();
 
-  const handleAddComment = async (content) => {
+  const createComment = async (comment) => {
     const fetchRes = await fetch(`/api/comments?slug=${slug}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ content })
+      body: JSON.stringify({ content: comment.content })
     });
 
     if (!fetchRes.ok) {
-      alert(`Error: ${fetchRes.text()}`);
+      throw new Error(await fetchRes.text());
     }
 
-    mutate();
+    const addedComment = await fetchRes.json();
+    mutate((currentComments) => {
+      const newComments = [];
+      for (const c of currentComments) {
+        // iterate over the existing comments cache
+        if (c.id === comment.id) {
+          newComments.push(addedComment);
+        } else {
+          newComments.push(c);
+        }
+      }
+
+      return newComments;
+    }, false);
+  };
+
+  const handleAddComment = async (content) => {
+     const mockCommentBody = {
+        id: Math.random(),
+        userId: session.user.id,
+        name: session.user.profile.name,
+        avatar: session.user.profile.avatar,
+        content,
+        createdAt: Date.now(),
+        clientOnly: true
+    }
+
+    mutate([...comments, mockCommentBody], false)
+
+    await createComment(mockCommentBody).catch((err) => {
+      mutate((currentComments) => {
+        const newComments = [];
+        for (const c of currentComments) {
+          if (c.id === mockCommentBody.id) {
+            newComments.push({
+              ...mockCommentBody,
+              error: err.message
+            });
+          } else {
+            newComments.push(c);
+          }
+        }
+
+        return newComments;
+      }, false);
+    });
   };
 
   if (!comments) {
@@ -40,9 +88,16 @@ export default function Comments({ slug }) {
       {comments && comments.length > 0 ? (
         <div className="comments">
           {comments.map((c) => (
-            <div key={c.id} className={c.clientOnly ? 'comment client-only' : 'comment'}>
+            <div
+              key={c.id}
+              className={classNames({
+                comment: true,
+                'client-only': c.clientOnly,
+                error: c.error
+              })}
+            >
               <div className="comment-content">
-                <Markdown>{c.content || ''}</Markdown>
+                <Markdown>{c.error || c.content || ''}</Markdown>
               </div>
               <div className="comment-author">
                 <img src={c.avatar} title={c.name} />
